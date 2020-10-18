@@ -21,7 +21,3 @@
   text-transform: capitalize;
   user-select: none;
 }
-
-.square:hover {
-  background-color: chartreuse;
-}

@@ -1,29 +1,24 @@
-import React, { useState } from "react"
+import React from "react"
 import type { FunctionComponent } from "react"
 
 import { Board } from "./components/Board"
+import { WordList } from "./components/WordList"
 
+import { useBoggleDispatch } from "./context"
 import "./App.css"
 
-function getRandomCharCode() {
-  return Math.floor(Math.random() * (122 - 97 + 1) + 97) //The maximum is inclusive and the minimum is inclusive
-}
-
 export const App: FunctionComponent = () => {
-  const [letters, setLetters] = useState<string[]>([])
+  const dispatch = useBoggleDispatch()
 
-  function generateBoard() {
-    const temp: string[] = []
-    for (let i = 0; i < 16; i++) {
-      temp.push(String.fromCharCode(getRandomCharCode()))
-    }
-    setLetters(temp)
+  function handleClick() {
+    dispatch({ type: "GenerateLetters" })
   }
 
   return (
     <div className="App">
-      <Board size={800} letters={letters} />
-      <button onClick={generateBoard}>Generate Board</button>
+      <WordList />
+      <Board size={400} />
+      <button onClick={handleClick}>Generate Board</button>
     </div>
   )
 }

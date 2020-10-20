@@ -1,18 +1,11 @@
 import React, { createContext, useContext, useReducer } from "react"
 import type { FunctionComponent } from "react"
 
-import { boggleReducer } from "./reducers"
+import { boggleReducer, initialState } from "./reducers"
 import type { Dispatch, State } from "./reducers"
 
 const BoggleStateContext = createContext<State | undefined>(undefined)
 const BoggleDispatchContext = createContext<Dispatch | undefined>(undefined)
-
-const initialState: State = {
-  dictionary: new Set(),
-  letters: [],
-  currentWordIndexes: [],
-  foundWords: new Set()
-}
 
 const BoggleProvider: FunctionComponent = ({ children }) => {
   const [state, dispatch] = useReducer(boggleReducer, initialState)

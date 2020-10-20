@@ -1,18 +1,43 @@
+const dice = [
+  ["R", "I", "F", "O", "B", "X"],
+  ["I", "F", "E", "H", "E", "Y"],
+  ["D", "E", "N", "O", "W", "S"],
+  ["U", "T", "O", "K", "N", "D"],
+  ["H", "M", "S", "R", "A", "O"],
+  ["L", "U", "P", "E", "T", "S"],
+  ["A", "C", "I", "T", "O", "A"],
+  ["Y", "L", "G", "K", "U", "E"],
+  ["Qu", "B", "M", "J", "O", "A"],
+  ["E", "H", "I", "S", "P", "N"],
+  ["V", "E", "T", "I", "G", "N"],
+  ["B", "A", "L", "I", "Y", "T"],
+  ["E", "Z", "A", "V", "N", "D"],
+  ["R", "A", "L", "E", "S", "C"],
+  ["U", "W", "I", "L", "R", "G"],
+  ["P", "A", "C", "E", "M", "D"]
+]
+
+function rollDie(die: string[]) {
+  const index = Math.floor(Math.random() * 6)
+  return die[index]
+}
+
 export function generateBoard() {
   const board: string[] = []
+  const tempDice = [...dice]
+
   for (let i = 0; i < 16; i++) {
-    board.push(String.fromCharCode(getRandomCharCode()))
+    const dieIndex = Math.floor(Math.random() * tempDice.length)
+    const die = tempDice[dieIndex]
+    board.push(rollDie(die))
+    tempDice.splice(dieIndex, 1)
   }
   return board
 }
 
-function getRandomCharCode() {
-  return Math.floor(Math.random() * (122 - 97 + 1) + 97)
-}
-
 export function formWordFromIndexes(board: string[], indexes: number[]) {
-  const letters = indexes.map((index) => board[index])
-  return letters.join("")
+  const letters = indexes.map(index => board[index])
+  return letters.join("").toLowerCase()
 }
 
 function isAdjacent(currentIndex: number, lastIndex: number) {
@@ -54,4 +79,20 @@ export async function loadDictionary() {
   const text = await response.text()
 
   return new Set(text.split("\n"))
+}
+
+export function wordScore(word: string) {
+  return word.length === 3 || word.length === 4
+    ? 1
+    : word.length === 5
+    ? 2
+    : word.length === 6
+    ? 3
+    : word.length === 7
+    ? 5
+    : 11
+}
+
+export function calculateScore(foundWords: string[]) {
+  return foundWords.reduce((score, word) => score + wordScore(word), 0)
 }

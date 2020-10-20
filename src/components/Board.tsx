@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import type { FunctionComponent } from "react"
 
 import { Square } from "./Square"
@@ -17,8 +17,8 @@ function getIndex(element: HTMLElement) {
   return parseInt(index)
 }
 
-export const Board: FunctionComponent<Props> = ({ size }) => {
-  const { letters, currentWordIndexes } = useBoggleState()
+export const Board: FunctionComponent<Props> = React.memo(({ size }) => {
+  const { board, currentWordIndexes } = useBoggleState()
   const dispatch = useBoggleDispatch()
 
   const squareSize = size / 4
@@ -26,10 +26,6 @@ export const Board: FunctionComponent<Props> = ({ size }) => {
     width: size,
     height: size
   }
-
-  useEffect(() => {
-    dispatch({ type: "GenerateLetters" })
-  }, [dispatch])
 
   function handleMouseDown(event: any) {
     const index = getIndex(event.target)
@@ -49,7 +45,7 @@ export const Board: FunctionComponent<Props> = ({ size }) => {
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
-      {letters.map((letter, i) => (
+      {board.map((letter, i) => (
         <Square
           key={i}
           index={i}
@@ -60,4 +56,4 @@ export const Board: FunctionComponent<Props> = ({ size }) => {
       ))}
     </div>
   )
-}
+})

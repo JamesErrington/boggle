@@ -4,14 +4,15 @@ import { generateBoard, formWordFromIndexes, isValidMove } from "./utils"
 
 export interface State {
   dictionary: Set<string>
-  letters: string[]
+  board: string[]
   currentWordIndexes: number[]
   foundWords: Set<string>
+  timer: number
 }
 
 type Action =
   | { type: "LoadDictionary"; payload: Set<string> }
-  | { type: "GenerateLetters" }
+  | { type: "NewGame" }
   | {
       type: "StartWord"
       payload: number
@@ -23,8 +24,19 @@ type Action =
       type: "AddToWord"
       payload: number
     }
+  | {
+      type: "TickTimer"
+    }
 
 export type Dispatch = ReactDispatch<Action>
+
+export const initialState: State = {
+  dictionary: new Set(),
+  board: [],
+  currentWordIndexes: [],
+  foundWords: new Set(),
+  timer: 0
+}
 
 export function boggleReducer(state: State, action: Action) {
   switch (action.type) {
@@ -34,10 +46,11 @@ export function boggleReducer(state: State, action: Action) {
         dictionary: action.payload
       }
     }
-    case "GenerateLetters": {
+    case "NewGame": {
       return {
-        ...state,
-        letters: generateBoard()
+        ...initialState,
+        dictionary: state.dictionary,
+        board: generateBoard()
       }
     }
     case "StartWord": {
@@ -49,7 +62,7 @@ export function boggleReducer(state: State, action: Action) {
     case "EndWord": {
       if (state.currentWordIndexes.length > 2) {
         const foundWord = formWordFromIndexes(
-          state.letters,
+          state.board,
           state.currentWordIndexes
         )
         if (
@@ -80,8 +93,15 @@ export function boggleReducer(state: State, action: Action) {
       }
       return state
     }
+    case "TickTimer": {
+      return {
+        ...state,
+        timer: state.timer + 1
+      }
+    }
     default: {
-      throw new Error(`Unhandled action: ${action}`)
+      // @ts-ignore
+      throw new Error(`Unhandled action: ${action.type}`)
     }
   }
 }

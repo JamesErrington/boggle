@@ -7,6 +7,11 @@
   flex-direction: column;
 }
 
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
 .board {
   display: flex;
   flex-wrap: wrap;
@@ -20,4 +25,18 @@
   align-items: center;
   text-transform: capitalize;
   user-select: none;
+}
+
+.score-table-container {
+  width: 150px;
+  text-align: center;
+}
+
+.score-table {
+  width: 100%;
+  text-align: left;
+}
+
+.word-list-list {
+  text-align: left;
 }

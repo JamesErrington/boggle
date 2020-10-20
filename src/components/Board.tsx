@@ -12,7 +12,7 @@ interface Props {
 function getIndex(element: HTMLElement) {
   const index = element.getAttribute("data-index")
   if (index === null) {
-    throw new Error(`Element ${element} has no attribute 'data-index'`)
+    return null
   }
   return parseInt(index)
 }
@@ -24,8 +24,7 @@ export const Board: FunctionComponent<Props> = ({ size }) => {
   const squareSize = size / 4
   const style = {
     width: size,
-    height: size,
-    
+    height: size
   }
 
   useEffect(() => {
@@ -33,7 +32,10 @@ export const Board: FunctionComponent<Props> = ({ size }) => {
   }, [dispatch])
 
   function handleMouseDown(event: any) {
-    dispatch({ type: "StartWord", payload: getIndex(event.target) })
+    const index = getIndex(event.target)
+    if (index !== null) {
+      dispatch({ type: "StartWord", payload: index })
+    }
   }
 
   function handleMouseUp(event: any) {

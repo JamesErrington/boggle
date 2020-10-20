@@ -3,12 +3,14 @@ import type { Dispatch as ReactDispatch } from "react"
 import { generateBoard, formWordFromIndexes, isValidMove } from "./utils"
 
 export interface State {
+  dictionary: Set<string>
   letters: string[]
   currentWordIndexes: number[]
-  foundWords: string[]
+  foundWords: Set<string>
 }
 
 type Action =
+  | { type: "LoadDictionary"; payload: Set<string> }
   | { type: "GenerateLetters" }
   | {
       type: "StartWord"
@@ -26,6 +28,12 @@ export type Dispatch = ReactDispatch<Action>
 
 export function boggleReducer(state: State, action: Action) {
   switch (action.type) {
+    case "LoadDictionary": {
+      return {
+        ...state,
+        dictionary: action.payload
+      }
+    }
     case "GenerateLetters": {
       return {
         ...state,
@@ -44,10 +52,13 @@ export function boggleReducer(state: State, action: Action) {
           state.letters,
           state.currentWordIndexes
         )
-        if (state.foundWords.includes(foundWord) === false) {
+        if (
+          state.foundWords.has(foundWord) === false &&
+          state.dictionary.has(foundWord)
+        ) {
           return {
             ...state,
-            foundWords: [...state.foundWords, foundWord],
+            foundWords: new Set([...state.foundWords, foundWord]),
             currentWordIndexes: []
           }
         }

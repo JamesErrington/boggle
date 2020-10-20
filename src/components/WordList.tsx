@@ -9,7 +9,7 @@ export const WordList: FunctionComponent<Props> = () => {
   const { foundWords } = useBoggleState()
   return (
     <ol>
-      {foundWords.map((word) => (
+      {foundWords.map(word => (
         <li key={word}>{word}</li>
       ))}
     </ol>

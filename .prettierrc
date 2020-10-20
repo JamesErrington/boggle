@@ -2,5 +2,6 @@
   "semi": false,
   "trailingComma": "none",
   "bracketSpacing": true,
-  "singleQuote": false
+  "singleQuote": false,
+  "arrowParens": "avoid"
 }

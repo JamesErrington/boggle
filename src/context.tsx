@@ -8,9 +8,10 @@ const BoggleStateContext = createContext<State | undefined>(undefined)
 const BoggleDispatchContext = createContext<Dispatch | undefined>(undefined)
 
 const initialState: State = {
+  dictionary: new Set(),
   letters: [],
   currentWordIndexes: [],
-  foundWords: []
+  foundWords: new Set()
 }
 
 const BoggleProvider: FunctionComponent = ({ children }) => {
@@ -31,7 +32,11 @@ function useBoggleState() {
   if (context === undefined) {
     throw new Error("useBoggleState must be inside a BoggleProvider")
   }
-  return context
+  const foundWords = Array.from(context.foundWords)
+  return {
+    ...context,
+    foundWords
+  }
 }
 
 function useBoggleDispatch() {

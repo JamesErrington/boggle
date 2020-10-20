@@ -84,6 +84,14 @@ export function boggleReducer(state: State, action: Action) {
     case "AddToWord": {
       const { currentWordIndexes } = state
       const { payload } = action
+      // If the selected square is the one we just came from, we remove the last selection
+      const [last, ...rest] = [...currentWordIndexes].reverse()
+      if(payload === currentWordIndexes[currentWordIndexes.length - 2]) {
+        return {
+          ...state,
+          currentWordIndexes: rest.reverse()
+        }
+      }
 
       if (isValidMove(currentWordIndexes, payload)) {
         return {

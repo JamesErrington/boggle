@@ -9,7 +9,7 @@ interface Props {
   selected: boolean
 }
 
-const borderSize = 2
+const borderSize = 3
 const marginSize = 10
 
 export const Square: FunctionComponent<Props> = React.memo(
@@ -22,7 +22,7 @@ export const Square: FunctionComponent<Props> = React.memo(
       border: `${borderSize}px solid black`,
       margin: marginSize,
       fontSize: size / 2,
-      backgroundColor: selected ? "green" : "unset"
+      backgroundColor: selected ? "green" : "white"
     }
 
     function handleMouseEnter(event: any) {

@@ -8,11 +8,22 @@ export interface State {
   currentWordIndexes: number[]
   foundWords: Set<string>
   timer: number
+  inGame: boolean
+  paused: boolean
+  modalOpen: boolean
 }
 
 type Action =
-  | { type: "LoadDictionary"; payload: Set<string> }
+  | {
+      type: "LoadDictionary"
+      payload: Set<string>
+    }
   | { type: "NewGame" }
+  | { type: "RestartGame" }
+  | {
+      type: "TogglePaused"
+      payload: boolean
+    }
   | {
       type: "StartWord"
       payload: number
@@ -27,6 +38,7 @@ type Action =
   | {
       type: "TickTimer"
     }
+  | { type: "ToggleModal" }
 
 export type Dispatch = ReactDispatch<Action>
 
@@ -35,7 +47,10 @@ export const initialState: State = {
   board: [],
   currentWordIndexes: [],
   foundWords: new Set(),
-  timer: 0
+  timer: 120,
+  inGame: false,
+  paused: false,
+  modalOpen: false
 }
 
 export function boggleReducer(state: State, action: Action) {
@@ -50,7 +65,22 @@ export function boggleReducer(state: State, action: Action) {
       return {
         ...initialState,
         dictionary: state.dictionary,
-        board: generateBoard()
+        board: generateBoard(),
+        inGame: true
+      }
+    }
+    case "RestartGame": {
+      return {
+        ...initialState,
+        dictionary: state.dictionary,
+        board: state.board,
+        inGame: true
+      }
+    }
+    case "TogglePaused": {
+      return {
+        ...state,
+        paused: action.payload
       }
     }
     case "StartWord": {
@@ -86,7 +116,7 @@ export function boggleReducer(state: State, action: Action) {
       const { payload } = action
       // If the selected square is the one we just came from, we remove the last selection
       const [last, ...rest] = [...currentWordIndexes].reverse()
-      if(payload === currentWordIndexes[currentWordIndexes.length - 2]) {
+      if (payload === currentWordIndexes[currentWordIndexes.length - 2]) {
         return {
           ...state,
           currentWordIndexes: rest.reverse()
@@ -104,7 +134,13 @@ export function boggleReducer(state: State, action: Action) {
     case "TickTimer": {
       return {
         ...state,
-        timer: state.timer + 1
+        timer: state.timer - 1
+      }
+    }
+    case "ToggleModal": {
+      return {
+        ...state,
+        modalOpen: !state.modalOpen
       }
     }
     default: {

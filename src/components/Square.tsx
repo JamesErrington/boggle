@@ -7,13 +7,14 @@ interface Props {
   size: number
   letter: string
   selected: boolean
+  paused: boolean
 }
 
 const borderSize = 3
 const marginSize = 10
 
 export const Square: FunctionComponent<Props> = React.memo(
-  ({ index, size, letter, selected }) => {
+  ({ index, size, letter, selected, paused }) => {
     const dispatch = useBoggleDispatch()
 
     const style = {
@@ -36,7 +37,7 @@ export const Square: FunctionComponent<Props> = React.memo(
         data-index={index}
         onMouseEnter={handleMouseEnter}
       >
-        {letter}
+        {paused ? "" : letter}
       </div>
     )
   }

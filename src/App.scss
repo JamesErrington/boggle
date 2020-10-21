@@ -1,0 +1,125 @@
+.App {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: linen;
+}
+
+.how-to-play-modal {
+  position: absolute;
+  width: 400px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  border: 5px solid black;
+  background-color: ivory;
+
+  h2 {
+    margin-bottom: 0;
+  }
+
+  .how-to-play-rules {
+    height: 70%;
+  }
+}
+
+.main-splash {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  button {
+    margin: 10px;
+  }
+}
+
+.game {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr [top] 500px [bottom] 1fr;
+  grid-template-columns: 1fr [left] 500px [right] 1fr;
+
+  .board-container {
+    grid-row: top / bottom;
+    grid-column: left / right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .board {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 20px;
+      border: 5px solid black;
+      border-radius: 10px;
+      background-color: orange;
+      text-align: center;
+
+      .square {
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: capitalize;
+        user-select: none;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  .score-container {
+    grid-row: top / bottom;
+    grid-column: right;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+
+    .score-table-container {
+      width: 200px;
+      text-align: center;
+      height: 100%;
+
+      .score-table {
+        width: 100%;
+        text-align: center;
+
+        tr {
+          th:nth-of-type(1) {
+            width: 45px;
+          }
+
+          th:nth-of-type(2),
+          td:nth-of-type(2) {
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+
+  .game-controls-container {
+    grid-row: bottom;
+    grid-column: left / right;
+    display: flex;
+    justify-content: center;
+
+    button {
+      margin: 10px;
+    }
+  }
+
+  .timer-container {
+    grid-row: 1;
+    grid-column: left / right;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+}

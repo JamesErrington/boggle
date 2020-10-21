@@ -7,6 +7,7 @@ import { useBoggleDispatch, useBoggleState } from "../context"
 
 interface Props {
   size: number
+  disabled: boolean
 }
 
 function getIndex(element: HTMLElement) {
@@ -17,43 +18,51 @@ function getIndex(element: HTMLElement) {
   return parseInt(index)
 }
 
-export const Board: FunctionComponent<Props> = React.memo(({ size }) => {
-  const { board, currentWordIndexes } = useBoggleState()
-  const dispatch = useBoggleDispatch()
+export const Board: FunctionComponent<Props> = React.memo(
+  ({ size, disabled }) => {
+    const { board, currentWordIndexes, paused } = useBoggleState()
+    const dispatch = useBoggleDispatch()
 
-  const squareSize = size / 4
-  const style = {
-    width: size,
-    height: size
-  }
-
-  function handleMouseDown(event: any) {
-    const index = getIndex(event.target)
-    if (index !== null) {
-      dispatch({ type: "StartWord", payload: index })
+    const squareSize = size / 4
+    const style = {
+      width: size,
+      height: size,
+      opacity: disabled ? "50%" : "100%"
     }
-  }
 
-  function handleMouseUp(event: any) {
-    dispatch({ type: "EndWord" })
-  }
+    function handleMouseDown(event: any) {
+      if (disabled || paused) {
+        return
+      }
 
-  return (
-    <div
-      className="board"
-      style={style}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-    >
-      {board.map((letter, i) => (
-        <Square
-          key={i}
-          index={i}
-          size={squareSize}
-          letter={letter}
-          selected={currentWordIndexes.includes(i)}
-        />
-      ))}
-    </div>
-  )
-})
+      const index = getIndex(event.target)
+      if (index !== null) {
+        dispatch({ type: "StartWord", payload: index })
+      }
+    }
+
+    function handleMouseUp(event: any) {
+      dispatch({ type: "EndWord" })
+    }
+
+    return (
+      <div
+        className="board"
+        style={style}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      >
+        {board.map((letter, i) => (
+          <Square
+            key={i}
+            index={i}
+            size={squareSize}
+            letter={letter}
+            selected={currentWordIndexes.includes(i)}
+            paused={paused}
+          />
+        ))}
+      </div>
+    )
+  }
+)

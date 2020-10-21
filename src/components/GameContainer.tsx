@@ -15,7 +15,6 @@ interface Props {}
 export const GameContainer: FunctionComponent<Props> = () => {
   const { timer, paused } = useBoggleState()
   const dispatch = useBoggleDispatch()
-  const [interval, setTimerInterval] = useState<NodeJS.Timeout | null>(null)
 
   const formattedTimer = formatTimer(timer)
 
@@ -36,30 +35,25 @@ export const GameContainer: FunctionComponent<Props> = () => {
   }
 
   useEffect(() => {
-    const timerInterval = setInterval(() => {
-      dispatch({ type: "TickTimer" })
-    }, 1000)
-    setTimerInterval(timerInterval)
-
-    return () => clearInterval(timerInterval)
-  }, [dispatch])
-
-  useEffect(() => {
+    let interval
     if ((timer <= 0 || paused) && interval !== null) {
       clearInterval(interval)
+    } else if (!paused && interval == null) {
+      const timerInterval = setInterval(() => {
+        dispatch({ type: "TickTimer" })
+      }, 1000)
+      return () => clearInterval(timerInterval)
     }
-  }, [timer, paused])
+  }, [dispatch, paused, timer])
 
   return (
     <div className="game">
       <div className="timer-container">
+        <h3>Time Left:</h3>
         <h3>{formattedTimer}</h3>
       </div>
       <div className="board-container">
-        <Board size={400} disabled={timer <= 0} />
-      </div>
-      <div className="score-container">
-        <ScoreTable />
+        <Board disabled={timer <= 0} />
       </div>
       <div className="game-controls-container">
         <div>
@@ -70,6 +64,9 @@ export const GameContainer: FunctionComponent<Props> = () => {
           <button onClick={handleNewGameClick}>New Game</button>
           <button onClick={handleHTPClick}>How To Play</button>
         </div>
+      </div>
+      <div className="score-container">
+        <ScoreTable />
       </div>
     </div>
   )

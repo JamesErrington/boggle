@@ -25,14 +25,14 @@ type Action =
       payload: boolean
     }
   | {
-      type: "StartWord"
-      payload: number
-    }
-  | {
       type: "EndWord"
     }
   | {
       type: "AddToWord"
+      payload: number
+    }
+  | {
+      type: "AddToWordMobile"
       payload: number
     }
   | {
@@ -83,12 +83,6 @@ export function boggleReducer(state: State, action: Action) {
         paused: action.payload
       }
     }
-    case "StartWord": {
-      return {
-        ...state,
-        currentWordIndexes: [action.payload]
-      }
-    }
     case "EndWord": {
       if (state.currentWordIndexes.length > 2) {
         const foundWord = formWordFromIndexes(
@@ -130,6 +124,44 @@ export function boggleReducer(state: State, action: Action) {
         }
       }
       return state
+    }
+    case "AddToWordMobile": {
+      const { currentWordIndexes } = state
+      const { payload } = action
+      // If we tap on the same square, remove it
+      if (payload === currentWordIndexes[currentWordIndexes.length - 1]) {
+        const [last, ...rest] = [...currentWordIndexes].reverse()
+        return {
+          ...state,
+          currentWordIndexes: rest.reverse()
+        }
+      }
+
+      if (isValidMove(currentWordIndexes, payload) === false) {
+        return state
+      }
+
+      const newIndexes = [...state.currentWordIndexes, payload]
+      const foundWord = formWordFromIndexes(state.board, newIndexes)
+      console.log(
+        state.foundWords.has(foundWord),
+        state.dictionary.has(foundWord)
+      )
+
+      if (
+        state.foundWords.has(foundWord) === false &&
+        state.dictionary.has(foundWord)
+      ) {
+        return {
+          ...state,
+          foundWords: new Set([...state.foundWords, foundWord]),
+          currentWordIndexes: []
+        }
+      }
+      return {
+        ...state,
+        currentWordIndexes: newIndexes
+      }
     }
     case "TickTimer": {
       return {

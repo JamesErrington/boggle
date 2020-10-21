@@ -1,6 +1,6 @@
 import React from "react"
 import type { FunctionComponent } from "react"
-import { useBoggleDispatch } from "../context"
+import { useBoggleDispatch, useBoggleState } from "../context"
 
 interface Props {
   index: number
@@ -15,6 +15,7 @@ const marginSize = 10
 
 export const Square: FunctionComponent<Props> = React.memo(
   ({ index, size, letter, selected, paused }) => {
+    const { currentWordIndexes } = useBoggleState()
     const dispatch = useBoggleDispatch()
 
     const style = {
@@ -27,7 +28,9 @@ export const Square: FunctionComponent<Props> = React.memo(
     }
 
     function handleMouseEnter(event: any) {
-      dispatch({ type: "AddToWord", payload: index })
+      if (currentWordIndexes.length > 0) {
+        dispatch({ type: "AddToWord", payload: index })
+      }
     }
 
     return (

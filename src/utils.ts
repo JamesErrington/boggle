@@ -67,15 +67,17 @@ function isAdjacent(currentIndex: number, lastIndex: number) {
 }
 
 export function isValidMove(currentWordIndexes: number[], index: number) {
+  if (currentWordIndexes.length === 0) {
+    return true
+  }
   return (
-    currentWordIndexes.length > 0 &&
     currentWordIndexes.includes(index) === false &&
     isAdjacent(index, currentWordIndexes[currentWordIndexes.length - 1])
   )
 }
 
 export async function loadDictionary() {
-  const response = await fetch("/word-list.txt")
+  const response = await fetch("boggle/word-list.txt")
   const text = await response.text()
 
   return new Set(text.split("\n"))

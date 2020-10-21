@@ -1,3 +1,7 @@
+body {
+  background-color: linen;
+}
+
 .App {
   width: 100vw;
   height: 100vh;
@@ -5,7 +9,6 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: linen;
 }
 
 .how-to-play-modal {
@@ -42,9 +45,11 @@
 .game {
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-rows: 1fr [top] 500px [bottom] 1fr;
-  grid-template-columns: 1fr [left] 500px [right] 1fr;
+  @media (min-width: 725px) {
+    display: grid;
+    grid-template-rows: 1fr [top] 500px [bottom] 1fr;
+    grid-template-columns: 1fr [left] 500px [right] 1fr;
+  }
 
   .board-container {
     grid-row: top / bottom;
@@ -54,6 +59,10 @@
     align-items: center;
 
     .board {
+      min-width: 280px;
+      max-width: 400px;
+      min-height: 280px;
+      max-height: 400px;
       display: flex;
       flex-wrap: wrap;
       margin: 20px;
@@ -81,14 +90,25 @@
     justify-content: left;
     align-items: center;
 
+    @media (max-width: 724px) {
+      justify-content: center;
+    }
+
     .score-table-container {
       width: 200px;
       text-align: center;
-      height: 100%;
+
+      @media(min-width: 725px) {
+        height: 100%;
+      }
 
       .score-table {
         width: 100%;
         text-align: center;
+
+        tbody {
+          text-transform: uppercase;
+        }
 
         tr {
           th:nth-of-type(1) {
@@ -119,7 +139,13 @@
     grid-row: 1;
     grid-column: left / right;
     display: flex;
-    justify-content: center;
-    align-items: flex-end;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: column;
+    text-align: center;
+
+    h3 {
+      margin-bottom: 0;
+    }
   }
 }

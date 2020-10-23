@@ -1,10 +1,11 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 import type { FunctionComponent } from "react"
 
 import { Board } from "./Board"
-import { ScoreTable } from "./ScoreTable"
+import { WordTable } from "./WordTable"
 
 import { useBoggleDispatch, useBoggleState } from "../context"
+import { calculateScore } from "../utils"
 
 function formatTimer(seconds: number) {
   return new Date(seconds * 1000).toTimeString().substr(3, 5)
@@ -16,6 +17,10 @@ export const GameContainer: FunctionComponent<Props> = () => {
   const { timer, paused, foundWords, allWords } = useBoggleState()
   const dispatch = useBoggleDispatch()
 
+  const allWordsStrings = Object.keys(allWords)
+  const unfoundWords = useMemo(() => {
+    return allWordsStrings.filter(word => !foundWords.includes(word))
+  }, [allWordsStrings, foundWords])
   const formattedTimer = formatTimer(timer)
 
   function handlePauseClick() {
@@ -49,8 +54,18 @@ export const GameContainer: FunctionComponent<Props> = () => {
   return (
     <div className="game">
       <div className="timer-container">
-        <h3>Time Left:</h3>
+        <h3>Time Left</h3>
         <h3>{formattedTimer}</h3>
+        <div className="score-container">
+          <h3>
+            Found: {foundWords.length}{" "}
+            {timer <= 0 && `/ ${allWordsStrings.length}`}
+          </h3>
+          <h3>
+            Score: {calculateScore(foundWords)}{" "}
+            {timer <= 0 && `/ ${calculateScore(allWordsStrings)}`}
+          </h3>
+        </div>
       </div>
       <div className="board-container">
         <Board disabled={timer <= 0} />
@@ -65,9 +80,12 @@ export const GameContainer: FunctionComponent<Props> = () => {
           <button onClick={handleHTPClick}>How To Play</button>
         </div>
       </div>
-      <div className="score-container">
-        <ScoreTable words={foundWords} />
-        <ScoreTable words={Object.keys(allWords)} />
+      <div className="word-container">
+        <WordTable
+          foundWords={foundWords}
+          unfoundWords={unfoundWords}
+          showUnfound={timer <= 0}
+        />
       </div>
     </div>
   )

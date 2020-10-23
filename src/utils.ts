@@ -125,7 +125,7 @@ function findAllPaths(
 ) {
   const word = formWordFromIndexes(board, path)
 
-  if (word.length > 3 && dictionary.contains(word)) {
+  if (word.length >= 3 && dictionary.contains(word)) {
     paths[word] = path
   }
 

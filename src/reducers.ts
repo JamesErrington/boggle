@@ -85,6 +85,7 @@ export function boggleReducer(state: State, action: Action) {
         ...initialState,
         dictionary: state.dictionary,
         board: state.board,
+        allWords: state.allWords,
         inGame: true
       }
     }

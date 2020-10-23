@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import type { FunctionComponent } from "react"
 
 import { Board } from "./Board"
@@ -13,7 +13,7 @@ function formatTimer(seconds: number) {
 interface Props {}
 
 export const GameContainer: FunctionComponent<Props> = () => {
-  const { timer, paused } = useBoggleState()
+  const { timer, paused, foundWords, allWords } = useBoggleState()
   const dispatch = useBoggleDispatch()
 
   const formattedTimer = formatTimer(timer)
@@ -66,7 +66,8 @@ export const GameContainer: FunctionComponent<Props> = () => {
         </div>
       </div>
       <div className="score-container">
-        <ScoreTable />
+        <ScoreTable words={foundWords} />
+        <ScoreTable words={Object.keys(allWords)} />
       </div>
     </div>
   )

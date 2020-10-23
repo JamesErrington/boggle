@@ -1,14 +1,14 @@
 import React from "react"
 import type { FunctionComponent } from "react"
 
-import { useBoggleState } from "../context"
 import { calculateScore, wordScore } from "../utils"
 
-interface Props {}
+interface Props {
+  words: string[]
+}
 
-export const ScoreTable: FunctionComponent<Props> = React.memo(() => {
-  const { foundWords } = useBoggleState()
-  const score = calculateScore(foundWords)
+export const ScoreTable: FunctionComponent<Props> = React.memo(({ words }) => {
+  const score = calculateScore(words)
 
   return (
     <div className="score-table-container">
@@ -22,7 +22,7 @@ export const ScoreTable: FunctionComponent<Props> = React.memo(() => {
           </tr>
         </thead>
         <tbody>
-          {foundWords.map((word, index) => (
+          {words.map((word, index) => (
             <tr key={word}>
               <td>{index + 1}</td>
               <td>{word}</td>

@@ -7,10 +7,9 @@ import { BoggleProvider } from "./context"
 import "./index.css"
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BoggleProvider>
-      <App />
-    </BoggleProvider>
-  </React.StrictMode>,
+  <BoggleProvider>
+    <App />
+  </BoggleProvider>,
+
   document.getElementById("root")
 )

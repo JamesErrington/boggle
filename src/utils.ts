@@ -1,20 +1,22 @@
+import { Trie } from "./trie"
+
 const dice = [
-  ["R", "I", "F", "O", "B", "X"],
-  ["I", "F", "E", "H", "E", "Y"],
-  ["D", "E", "N", "O", "W", "S"],
-  ["U", "T", "O", "K", "N", "D"],
-  ["H", "M", "S", "R", "A", "O"],
-  ["L", "U", "P", "E", "T", "S"],
-  ["A", "C", "I", "T", "O", "A"],
-  ["Y", "L", "G", "K", "U", "E"],
-  ["Qu", "B", "M", "J", "O", "A"],
-  ["E", "H", "I", "S", "P", "N"],
-  ["V", "E", "T", "I", "G", "N"],
-  ["B", "A", "L", "I", "Y", "T"],
-  ["E", "Z", "A", "V", "N", "D"],
-  ["R", "A", "L", "E", "S", "C"],
-  ["U", "W", "I", "L", "R", "G"],
-  ["P", "A", "C", "E", "M", "D"]
+  ["r", "i", "f", "o", "b", "x"],
+  ["i", "f", "e", "h", "e", "y"],
+  ["d", "e", "n", "o", "w", "s"],
+  ["u", "t", "o", "k", "n", "d"],
+  ["h", "m", "s", "r", "a", "o"],
+  ["l", "u", "p", "e", "t", "s"],
+  ["a", "c", "i", "t", "o", "a"],
+  ["y", "l", "g", "k", "u", "e"],
+  ["qu", "b", "m", "j", "o", "a"],
+  ["e", "h", "i", "s", "p", "n"],
+  ["v", "e", "t", "i", "g", "n"],
+  ["b", "a", "l", "i", "y", "t"],
+  ["e", "Z", "a", "v", "n", "d"],
+  ["r", "a", "l", "e", "s", "c"],
+  ["u", "w", "i", "l", "r", "g"],
+  ["p", "a", "c", "e", "m", "d"]
 ]
 
 function rollDie(die: string[]) {
@@ -37,14 +39,14 @@ export function generateBoard() {
 
 export function formWordFromIndexes(board: string[], indexes: number[]) {
   const letters = indexes.map(index => board[index])
-  return letters.join("").toLowerCase()
+  return letters.join("")
 }
 
-function isAdjacent(currentIndex: number, lastIndex: number) {
-  const currentX = currentIndex % 4
-  const currentY = Math.floor(currentIndex / 4)
-  const lastX = lastIndex % 4
-  const lastY = Math.floor(lastIndex / 4)
+function isAdjacent(size: number, currentIndex: number, lastIndex: number) {
+  const currentX = currentIndex % size
+  const currentY = Math.floor(currentIndex / size)
+  const lastX = lastIndex % size
+  const lastY = Math.floor(lastIndex / size)
 
   return (
     // Above
@@ -72,7 +74,7 @@ export function isValidMove(currentWordIndexes: number[], index: number) {
   }
   return (
     currentWordIndexes.includes(index) === false &&
-    isAdjacent(index, currentWordIndexes[currentWordIndexes.length - 1])
+    isAdjacent(4, index, currentWordIndexes[currentWordIndexes.length - 1])
   )
 }
 
@@ -97,4 +99,48 @@ export function wordScore(word: string) {
 
 export function calculateScore(foundWords: string[]) {
   return foundWords.reduce((score, word) => score + wordScore(word), 0)
+}
+
+export function findAllWords(board: string[], dictionary: Set<string>) {
+  const trie = new Trie(dictionary)
+  const paths: Record<string, number[]> = {}
+
+  for (let i = 0; i < board.length; i++) {
+    const newTrie = trie.findTrie(board[i])
+
+    if (newTrie && newTrie.hasChildren()) {
+      findAllPaths(board, newTrie, i, [i], paths)
+    }
+  }
+
+  return paths
+}
+
+function findAllPaths(
+  board: string[],
+  dictionary: Trie,
+  index: number,
+  path: number[],
+  paths: Record<string, number[]>
+) {
+  const word = formWordFromIndexes(board, path)
+
+  if (word.length > 3 && dictionary.contains(word)) {
+    paths[word] = path
+  }
+
+  for (let i = 0; i < board.length; i++) {
+    const nextPath = [...path, i]
+    const nextWord = formWordFromIndexes(board, nextPath)
+    const newTrie = dictionary.findTrie(nextWord)
+
+    if (
+      newTrie &&
+      newTrie.hasChildren() &&
+      !path.includes(i) &&
+      isAdjacent(Math.sqrt(board.length), i, index)
+    ) {
+      findAllPaths(board, newTrie, i, nextPath, paths)
+    }
+  }
 }

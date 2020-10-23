@@ -1,0 +1,9 @@
+{
+  "preset": "ts-jest",
+  "verbose": true,
+  "moduleFileExtensions": ["tsx", "ts", "js", "jsx", "json", "node"],
+  "roots": ["src/test"],
+  "maxWorkers": 5,
+  "rootDir": ".",
+  "collectCoverage": true
+}

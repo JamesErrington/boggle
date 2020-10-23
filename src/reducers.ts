@@ -1,10 +1,16 @@
 import type { Dispatch as ReactDispatch } from "react"
 
-import { generateBoard, formWordFromIndexes, isValidMove } from "./utils"
+import {
+  generateBoard,
+  formWordFromIndexes,
+  isValidMove,
+  findAllWords
+} from "./utils"
 
 export interface State {
   dictionary: Set<string>
   board: string[]
+  allWords: Record<string, number[]>
   currentWordIndexes: number[]
   foundWords: Set<string>
   timer: number
@@ -45,6 +51,7 @@ export type Dispatch = ReactDispatch<Action>
 export const initialState: State = {
   dictionary: new Set(),
   board: [],
+  allWords: {},
   currentWordIndexes: [],
   foundWords: new Set(),
   timer: 120,
@@ -62,11 +69,15 @@ export function boggleReducer(state: State, action: Action) {
       }
     }
     case "NewGame": {
+      const board = generateBoard()
+      const words = findAllWords(board, state.dictionary)
+
       return {
         ...initialState,
         dictionary: state.dictionary,
-        board: generateBoard(),
-        inGame: true
+        allWords: words,
+        inGame: true,
+        board
       }
     }
     case "RestartGame": {
@@ -143,10 +154,6 @@ export function boggleReducer(state: State, action: Action) {
 
       const newIndexes = [...state.currentWordIndexes, payload]
       const foundWord = formWordFromIndexes(state.board, newIndexes)
-      console.log(
-        state.foundWords.has(foundWord),
-        state.dictionary.has(foundWord)
-      )
 
       if (
         state.foundWords.has(foundWord) === false &&

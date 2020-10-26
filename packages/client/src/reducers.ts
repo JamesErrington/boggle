@@ -1,4 +1,6 @@
+import client from "socket.io-client"
 import type { Dispatch as ReactDispatch } from "react"
+import type { Socket } from "socket.io-client"
 
 import {
   generateBoard,
@@ -6,6 +8,7 @@ import {
   isValidMove,
   findAllWords
 } from "./utils"
+
 
 export interface State {
   dictionary: Set<string>
@@ -17,6 +20,34 @@ export interface State {
   inGame: boolean
   paused: boolean
   modalOpen: boolean
+  socket: typeof Socket | null
+  socketState: SocketState | null
+}
+
+interface JoinGamePayload {
+  name: string
+  create?: boolean
+  code?: string
+}
+
+declare enum LobbyStatus {
+  OPEN = "open"
+}
+
+interface Player {
+  id: string
+  name: string
+}
+
+interface SocketState {
+  code: string
+  isHost: boolean
+  status: LobbyStatus
+  players: Player[]
+  player: Player
+  currentGame: {
+    board: string[]
+  }
 }
 
 type Action =
@@ -45,6 +76,15 @@ type Action =
       type: "TickTimer"
     }
   | { type: "ToggleModal" }
+  | { 
+      type: "JoinGame"
+      payload: JoinGamePayload 
+    }
+  | { 
+      type: "SocketUpdate"
+      payload: SocketState
+    }
+  | { type: "StartGame" }
 
 export type Dispatch = ReactDispatch<Action>
 
@@ -57,7 +97,9 @@ export const initialState: State = {
   timer: 120,
   inGame: false,
   paused: false,
-  modalOpen: false
+  modalOpen: false,
+  socket: null,
+  socketState: null
 }
 
 export function boggleReducer(state: State, action: Action) {
@@ -182,6 +224,39 @@ export function boggleReducer(state: State, action: Action) {
         ...state,
         modalOpen: !state.modalOpen
       }
+    }
+    case "JoinGame": {
+      const { name, create, code } = action.payload
+      const query = `name=${name}&${create ? `create=${create}` : ""}${code ? `code=${code}` : ""}`
+      const socket = client({
+        query
+      })
+
+      return {
+        ...state,
+        socket: socket
+      }
+    }
+    case "SocketUpdate": {
+      return {
+        ...state,
+        socketState: {
+          ...state.socketState,
+          ...action.payload
+        }
+      }
+    }
+    case "StartGame": {
+      console.log("StartGame dispatch")
+      if(state.socket && state.socketState) {
+        console.log("Emit Start")
+        state.socket.emit("start", {
+          code: state.socketState.code
+        })
+        return state
+      }
+      
+      throw new Error("Attempted to start multiplayer game with no active socket set")
     }
     default: {
       // @ts-ignore

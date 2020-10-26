@@ -79,7 +79,7 @@ export function isValidMove(currentWordIndexes: number[], index: number) {
 }
 
 export async function loadDictionary() {
-  const response = await fetch("boggle/word-list.txt")
+  const response = await fetch("word-list.txt")
   const text = await response.text()
 
   return new Set(text.split("\n"))

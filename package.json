@@ -4,46 +4,13 @@
   "description": "React implementation of the Boggle boardgame",
   "author": "James Errington <jmerrington07@gmail.com>",
   "private": true,
-  "dependencies": {
-    "@rehooks/component-size": "^1.0.3",
-    "gh-pages": "^3.1.0",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "react-scripts": "3.4.3"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/jest": "^24.0.0",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
-    "node-sass": "^4.14.1",
-    "prettier": "^2.1.2",
-    "ts-jest": "^26.4.1",
-    "typescript": "^4.0.3"
-  },
+  "workspaces": [
+    "packages/client",
+    "packages/server",
+    "packages/shared"
+  ],
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "yarn jest --config jest.config.json",
-    "eject": "react-scripts eject",
-    "lint": "prettier --write --loglevel warn . && eslint --fix --color --ext .ts,.tsx src/",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "homepage": "https://jameserrington.github.io/boggle/"
+    "start:client": "yarn workspace boggle-client start",
+    "start:server": "yarn workspace boggle-server start"
+  }
 }

@@ -11,6 +11,8 @@
   ],
   "scripts": {
     "start:client": "yarn workspace boggle-client start",
-    "start:server": "yarn workspace boggle-server start"
+    "start:server": "yarn workspace boggle-server start",
+    "build:client": "yarn workspace boggle-client build",
+    "build:server": "yarn workspace boggle-server build"
   }
 }

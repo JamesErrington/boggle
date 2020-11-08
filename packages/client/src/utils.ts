@@ -1,41 +1,5 @@
 import { Trie } from "./trie"
-
-const dice = [
-  ["r", "i", "f", "o", "b", "x"],
-  ["i", "f", "e", "h", "e", "y"],
-  ["d", "e", "n", "o", "w", "s"],
-  ["u", "t", "o", "k", "n", "d"],
-  ["h", "m", "s", "r", "a", "o"],
-  ["l", "u", "p", "e", "t", "s"],
-  ["a", "c", "i", "t", "o", "a"],
-  ["y", "l", "g", "k", "u", "e"],
-  ["qu", "b", "m", "j", "o", "a"],
-  ["e", "h", "i", "s", "p", "n"],
-  ["v", "e", "t", "i", "g", "n"],
-  ["b", "a", "l", "i", "y", "t"],
-  ["e", "Z", "a", "v", "n", "d"],
-  ["r", "a", "l", "e", "s", "c"],
-  ["u", "w", "i", "l", "r", "g"],
-  ["p", "a", "c", "e", "m", "d"]
-]
-
-function rollDie(die: string[]) {
-  const index = Math.floor(Math.random() * 6)
-  return die[index]
-}
-
-export function generateBoard() {
-  const board: string[] = []
-  const tempDice = [...dice]
-
-  for (let i = 0; i < 16; i++) {
-    const dieIndex = Math.floor(Math.random() * tempDice.length)
-    const die = tempDice[dieIndex]
-    board.push(rollDie(die))
-    tempDice.splice(dieIndex, 1)
-  }
-  return board
-}
+import { State, AppView, GameType, initialGameState } from "./hooks/reducer"
 
 export function formWordFromIndexes(board: string[], indexes: number[]) {
   const letters = indexes.map(index => board[index])
@@ -79,7 +43,7 @@ export function isValidMove(currentWordIndexes: number[], index: number) {
 }
 
 export async function loadDictionary() {
-  const response = await fetch("word-list.txt")
+  const response = await fetch("/boggle/word-list.txt")
   const text = await response.text()
 
   return new Set(text.split("\n"))
@@ -97,8 +61,8 @@ export function wordScore(word: string) {
     : 11
 }
 
-export function calculateScore(foundWords: string[]) {
-  return foundWords.reduce((score, word) => score + wordScore(word), 0)
+export function calculateScore(words: string[]) {
+  return words.reduce((score, word) => score + wordScore(word), 0)
 }
 
 export function findAllWords(board: string[], dictionary: Set<string>) {
@@ -113,7 +77,7 @@ export function findAllWords(board: string[], dictionary: Set<string>) {
     }
   }
 
-  return paths
+  return [Object.keys(paths), Object.values(paths)] as any
 }
 
 function findAllPaths(
@@ -141,6 +105,43 @@ function findAllPaths(
       isAdjacent(Math.sqrt(board.length), i, index)
     ) {
       findAllPaths(board, newTrie, i, nextPath, paths)
+    }
+  }
+}
+
+export function formatTime(seconds: number) {
+  return new Date(seconds * 1000).toTimeString().substr(3, 5)
+}
+
+export function getIndex(element: HTMLElement) {
+  const index = element.getAttribute("data-index")
+  if (index === null) {
+    return null
+  }
+  return parseInt(index)
+}
+
+export function setupGame(state: State, board: string[], gameType: GameType) {
+  if (state.dictionary === null) {
+    throw new Error("Dictionary not intialised")
+  }
+
+  const [allWordsStrings, allWordsIndexes] = findAllWords(
+    board,
+    state.dictionary
+  )
+  const allWordsScore = calculateScore(allWordsStrings)
+
+  return {
+    ...state,
+    gameType,
+    view: AppView.Game,
+    gameState: {
+      ...initialGameState,
+      board,
+      allWordsStrings,
+      allWordsIndexes,
+      allWordsScore
     }
   }
 }

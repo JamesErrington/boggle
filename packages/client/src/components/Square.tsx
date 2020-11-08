@@ -1,47 +1,60 @@
 import React from "react"
-import type { FunctionComponent } from "react"
-import { useBoggleDispatch, useBoggleState } from "../context"
+import type { FunctionComponent, CSSProperties } from "react"
+import { useBoggleDispatch } from "../hooks/context"
 
 interface Props {
   index: number
   size: number
   letter: string
-  selected: boolean
-  paused: boolean
+  isSelectable: boolean
+  isSelected: boolean
+  lineStyle: CSSProperties
+  isPaused: boolean
+  borderSize: number
+  marginSize: number
 }
 
-const borderSize = 3
-const marginSize = 10
+export const Square: FunctionComponent<Props> = ({
+  index,
+  size,
+  letter,
+  isSelectable,
+  isSelected,
+  lineStyle,
+  isPaused,
+  borderSize,
+  marginSize
+}) => {
+  const dispatch = useBoggleDispatch()
 
-export const Square: FunctionComponent<Props> = React.memo(
-  ({ index, size, letter, selected, paused }) => {
-    const { currentWordIndexes } = useBoggleState()
-    const dispatch = useBoggleDispatch()
-
-    const style = {
-      width: size - 2 * marginSize,
-      height: size - 2 * marginSize,
-      border: `${borderSize}px solid black`,
-      margin: marginSize,
-      fontSize: size / 2,
-      backgroundColor: selected ? "green" : "white"
-    }
-
-    function handleMouseEnter(event: any) {
-      if (currentWordIndexes.length > 0) {
-        dispatch({ type: "AddToWord", payload: index })
-      }
-    }
-
-    return (
-      <div
-        className="square"
-        style={style}
-        data-index={index}
-        onMouseEnter={handleMouseEnter}
-      >
-        {paused ? "" : letter}
-      </div>
-    )
+  const squareStyle = {
+    width: size - 2 * marginSize,
+    height: size - 2 * marginSize,
+    border: `${borderSize}px solid black`,
+    margin: marginSize,
+    fontSize: size / 2
   }
-)
+
+  function handleMouseEnter() {
+    if (isSelectable) {
+      dispatch({ type: "AddToWord", payload: index })
+    }
+  }
+
+  return (
+    <div
+      className="square"
+      style={squareStyle}
+      data-index={index}
+      onMouseEnter={handleMouseEnter}
+    >
+      {isSelected && (
+        <>
+          <div className="circle"></div>
+          <div className="line" style={lineStyle}></div>
+        </>
+      )}
+      {isPaused ? "" : letter}
+    </div>
+  )
+}

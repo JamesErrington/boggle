@@ -9,7 +9,7 @@ interface GameState {
 
 export interface Player {
   id: string
-  name: string
+  username: string
 }
 
 export interface Lobby {

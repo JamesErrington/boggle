@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useReducer } from "react"
 import type { FunctionComponent } from "react"
 
-import { boggleReducer, initialState } from "./reducers"
-import type { Dispatch, State } from "./reducers"
+import { boggleReducer, initialState } from "./reducer"
+import type { Dispatch, State } from "./reducer"
 
 const BoggleStateContext = createContext<State | undefined>(undefined)
 const BoggleDispatchContext = createContext<Dispatch | undefined>(undefined)
 
-const BoggleProvider: FunctionComponent = ({ children }) => {
+export const BoggleProvider: FunctionComponent = ({ children }) => {
   const [state, dispatch] = useReducer(boggleReducer, initialState)
 
   return (
@@ -19,20 +19,37 @@ const BoggleProvider: FunctionComponent = ({ children }) => {
   )
 }
 
-function useBoggleState() {
+export function useBoggleState() {
   const context = useContext(BoggleStateContext)
 
   if (context === undefined) {
     throw new Error("useBoggleState must be inside a BoggleProvider")
   }
-  const foundWords = Array.from(context.foundWords)
-  return {
-    ...context,
-    foundWords
-  }
+
+  return context
 }
 
-function useBoggleDispatch() {
+export function useGameState() {
+  const context = useContext(BoggleStateContext)
+
+  if (context === undefined) {
+    throw new Error("useBoggleState must be inside a BoggleProvider")
+  }
+
+  return context.gameState
+}
+
+export function useSocketState() {
+  const context = useContext(BoggleStateContext)
+
+  if (context === undefined) {
+    throw new Error("useBoggleState must be inside a BoggleProvider")
+  }
+
+  return context.socketState
+}
+
+export function useBoggleDispatch() {
   const context = useContext(BoggleDispatchContext)
 
   if (context === undefined) {
@@ -40,5 +57,3 @@ function useBoggleDispatch() {
   }
   return context
 }
-
-export { BoggleProvider, useBoggleState, useBoggleDispatch }

@@ -4,15 +4,43 @@
   "description": "React implementation of the Boggle boardgame",
   "author": "James Errington <jmerrington07@gmail.com>",
   "private": true,
-  "workspaces": [
-    "packages/client",
-    "packages/server",
-    "packages/shared"
-  ],
   "scripts": {
-    "start:client": "yarn workspace boggle-client start",
-    "start:server": "yarn workspace boggle-server start",
-    "build:client": "yarn workspace boggle-client build",
-    "build:server": "yarn workspace boggle-server build"
+    "lint": "prettier --write . && eslint --fix --color .",
+    "build:client": "snowpack build --config client/snowpack.config.json",
+    "build:server": "tsc --project server",
+    "build": "yarn build:client && yarn build:server",
+    "watch": "yarn build:client --watch & nodemon --config server/nodemon.json",
+    "start": "node build/index.js"
+  },
+  "engines": {
+    "node": "12.19.0",
+    "npm": "6.14.8",
+    "yarn": "1.22.5"
+  },
+  "dependencies": {
+    "@rehooks/component-size": "^1.0.3",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "@snowpack/plugin-optimize": "^0.2.9",
+    "@snowpack/plugin-typescript": "^1.1.0",
+    "@types/express": "^4.17.9",
+    "@types/morgan": "^1.9.2",
+    "@types/node": "^14.14.7",
+    "@types/react": "^16.9.56",
+    "@types/react-dom": "^16.9.9",
+    "@types/snowpack-env": "^2.3.2",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "eslint": "^7.13.0",
+    "eslint-plugin-react": "^7.21.5",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.1.2",
+    "snowpack": "^2.17.1",
+    "snowpack-plugin-sass": "^1.0.1",
+    "typescript": "~4.0.5"
   }
 }

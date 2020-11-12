@@ -1,0 +1,19 @@
+{
+  "mount": {
+    "client/public": "/",
+    "client/src": "/_dist_"
+  },
+  "buildOptions": {
+    "out": "build/static"
+  },
+  "plugins": [
+    "snowpack-plugin-sass",
+    [
+      "@snowpack/plugin-typescript",
+      {
+        "args": "--project client/tsconfig.json"
+      }
+    ],
+    "@snowpack/plugin-optimize"
+  ]
+}

@@ -1,0 +1,243 @@
+body {
+  background-color: linen;
+}
+
+.App {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.how-to-play-modal {
+  position: absolute;
+  width: 400px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  border: 5px solid black;
+  background-color: ivory;
+
+  h2 {
+    margin-bottom: 0;
+  }
+
+  .how-to-play-rules {
+    height: 70%;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  button {
+    margin: 10px;
+  }
+}
+
+.lobby {
+  width: 500px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  input {
+    text-align: center;
+  }
+
+  .lobby-username {
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .lobby-options {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+
+    h3 {
+      margin: 20px 0px 10px 0px;
+    }
+
+    .lobby-code {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+
+      label {
+        text-align: center;
+        width: 40%;
+      }
+
+      input {
+        width: 95px;
+      }
+    }
+  }
+}
+
+.game {
+  width: 100%;
+  height: 100%;
+  @media (min-width: 725px) {
+    display: grid;
+    grid-template-rows: 1fr [top] 450px [bottom] 1fr;
+    grid-template-columns: 1fr [left] 450px [right] 1fr;
+  }
+
+  .board-container {
+    grid-row: top / bottom;
+    grid-column: left / right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .board {
+      min-width: 280px;
+      max-width: 400px;
+      min-height: 280px;
+      max-height: 400px;
+      display: flex;
+      flex-wrap: wrap;
+      margin: 20px;
+      border: 5px solid black;
+      border-radius: 10px;
+      background-color: orange;
+      text-align: center;
+      pointer-events: auto;
+
+      .square {
+        position: relative;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: capitalize;
+        user-select: none;
+        border-radius: 10px;
+        color: black;
+        background-color: white;
+        pointer-events: auto;
+
+        .circle {
+          position: absolute;
+          width: 85%;
+          height: 85%;
+          border-radius: 55%;
+          background-color: lightblue;
+          opacity: 50%;
+          pointer-events: none;
+        }
+
+        .line {
+          position: absolute;
+          z-index: 1;
+          border-end-end-radius: 5px;
+          background-color: lightblue;
+          opacity: 50%;
+          pointer-events: none;
+        }
+      }
+
+      // .square::before {
+      //   content: "";
+      //   position: absolute;
+      //   width: 100%;
+      //   height: 5px;
+      //   background-color: black;
+      // }
+    }
+  }
+
+  .word-container {
+    grid-row: top / bottom;
+    grid-column: right;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+
+    @media (max-width: 724px) {
+      justify-content: center;
+    }
+
+    .word-table-container {
+      width: 200px;
+      text-align: center;
+      overflow-y: scroll;
+
+      @media (min-width: 725px) {
+        height: 100%;
+      }
+
+      table {
+        margin-top: 20px;
+        width: 100%;
+        text-align: center;
+
+        tr {
+          td:nth-of-type(1) {
+            width: 45px;
+          }
+
+          td:nth-of-type(2) {
+            width: 70px;
+          }
+
+          th:nth-of-type(2),
+          td:nth-of-type(2) {
+            text-align: left;
+          }
+        }
+
+        tbody {
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+
+  .game-controls-container {
+    grid-row: bottom;
+    grid-column: left / right;
+    display: flex;
+    justify-content: center;
+
+    button {
+      margin: 10px;
+    }
+  }
+
+  .timer-container {
+    grid-row: 1;
+    grid-column: left / right;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: column;
+    text-align: center;
+
+    h3 {
+      margin: 10px 20px 0px 20px;
+    }
+
+    .score-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+}

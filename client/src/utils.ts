@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react"
-import { Word } from "../../shared/types"
+import { Word, Result, Player } from "../../shared/types"
 
 export const borderSize = 3
 export const marginSize = 10
@@ -161,4 +161,14 @@ export function lookupWordFromString(totalWords: Word[], foundString: string) {
 
 export function wordAlreadyFound(foundWords: Word[], foundWord: Word) {
   return foundWords.some(({ string }) => string === foundWord.string)
+}
+
+export function formatResultString(result: Result, players: Player[]) {
+  const winningNames = Object.keys(result.winners)
+    .map(id => players.find(player => player.id === id)?.username)
+    .join(", ")
+  if (winningNames.length === 0) {
+    return "No one scored any points this round 😢"
+  }
+  return `${winningNames} won this round with a score of ${result.score} from ${result.uniqueWords} unique words 🎉`
 }

@@ -2,7 +2,7 @@ import path from "path"
 import { readFileSync } from "fs"
 
 import { Trie } from "./trie"
-import type { Word } from "../../shared/types"
+import type { Word, Player, Lobby, SocketConnectionQuery, FoundWords, Result } from "../../shared/types"
 
 const dice = [
   ["r", "i", "f", "o", "b", "x"],
@@ -68,7 +68,8 @@ export function findAllWords(board: string[], dictionary: Set<string>) {
   const words = Object.entries(paths).map(([word, path]) => ({
     string: word,
     path,
-    score: wordScore(word)
+    score: wordScore(word),
+    foundBySomeoneElse: false
   }))
   const totalWordCount = words.length
   const totalWordScore = _calculateScore(words)
@@ -81,7 +82,60 @@ export function findAllWords(board: string[], dictionary: Set<string>) {
 }
 
 function _calculateScore(words: Word[]) {
-  return words.reduce((total, { score }) => total + score, 0)
+  return words.reduce((total, { score, foundBySomeoneElse }) => total + (foundBySomeoneElse ? 0 : score), 0)
+}
+
+function _uniqueWords(words: Word[]) {
+  return words.reduce((total, { foundBySomeoneElse }) => total + (foundBySomeoneElse ? 0 : 1), 0)
+}
+
+export function processMultiplayerFoundWords(lobbyWords: Record<string, FoundWords>, words: Word[]) {
+  // For each of the words we have just found, we need to check if any of them have been found already
+  words.forEach(playerWord => {
+    Object.values(lobbyWords).forEach(foundWords => {
+      foundWords.words.forEach(otherPlayerWord => {
+        if (playerWord.string === otherPlayerWord.string) {
+          playerWord.foundBySomeoneElse = true
+          otherPlayerWord.foundBySomeoneElse = true
+        }
+      })
+    })
+  })
+
+  return {
+    score: 0,
+    words
+  }
+}
+
+export function calculateMultiplayerScores(lobbyWords: Record<string, FoundWords>) {
+  const result: Result = {
+    winners: {},
+    score: 0,
+    uniqueWords: 0
+  }
+  Object.entries(lobbyWords).forEach(([id, foundWords]) => {
+    const score = _calculateScore(foundWords.words)
+    const uniqueWords = _uniqueWords(foundWords.words)
+    foundWords.score = score
+
+    if ((score > 0 && score > result.score) || (score === result.score && uniqueWords > result.uniqueWords)) {
+      result.winners = {}
+      result.score = score
+      result.uniqueWords = uniqueWords
+      result.winners[id] = {
+        score,
+        uniqueWords
+      }
+    } else if (score > 0 && score === result.score) {
+      result.winners[id] = {
+        score,
+        uniqueWords
+      }
+    }
+  })
+
+  return result
 }
 
 function _findAllPaths(board: string[], dictionary: Trie, index: number, path: number[], paths: Record<string, number[]>) {
@@ -133,6 +187,16 @@ function _isAdjacent(size: number, currentIndex: number, lastIndex: number) {
   )
 }
 
+export function setupGame(dictionary: Set<string>) {
+  const board = generateBoard()
+  const allWords = findAllWords(board, dictionary)
+
+  return {
+    board,
+    ...allWords
+  }
+}
+
 export function loadDictionary() {
   try {
     console.log("[server] Loading dictionary...")
@@ -143,4 +207,73 @@ export function loadDictionary() {
     console.error(ex)
     process.exit(1)
   }
+}
+
+export function _generateCode() {
+  let code = ""
+  for (let i = 0; i < 4; i++) {
+    code = code + String.fromCharCode(Math.floor(Math.random() * (90 - 65) + 65))
+  }
+  return code
+}
+
+function _createLobby(host: Player, lobbies: Record<string, Lobby>): Lobby {
+  let code = undefined
+  while (code === undefined || Object.keys(lobbies).includes(code)) {
+    code = _generateCode()
+  }
+
+  const lobby: Lobby = {
+    code,
+    host: host.id,
+    players: [host],
+    timeLeft: 120,
+    foundWords: {}
+  }
+  lobbies[code] = lobby
+
+  return lobby
+}
+
+export function resetLobby(lobby: Lobby) {
+  lobby.foundWords = {}
+  lobby.timeLeft = 120
+}
+
+export function findLobby(code: string, lobbies: Record<string, Lobby>): Lobby | undefined {
+  const found = Object.entries(lobbies).find(([lobbyCode]) => lobbyCode === code)
+  return (found && found[1]) || undefined
+}
+
+export function findPlayer(id: string, players: Player[]): Player {
+  const found = players.find(player => player.id === id)
+  if (!found) {
+    throw new Error(`Failed to find player with id ${id}`)
+  }
+  return found
+}
+
+export function findOrCreateLobby(
+  query: SocketConnectionQuery,
+  player: Player,
+  lobbies: Record<string, Lobby>
+): Lobby | undefined | null {
+  let lobby: Lobby | undefined = undefined
+  if (query.create === "true") {
+    lobby = _createLobby(player, lobbies)
+    console.log(`[socket] Lobby ${lobby.code} created with host ${player.id}`)
+  } else if (query.code) {
+    const found = findLobby(query.code, lobbies)
+    if (found) {
+      const usernameTaken = found.players.some(lobbyPlayer => lobbyPlayer.username === player.username)
+      if (usernameTaken) {
+        return null
+      }
+      lobby = found
+      lobby.players.push(player)
+      console.log(`[socket] Player ${player.id} assigned to lobby ${lobby.code}`)
+    }
+  }
+
+  return lobby
 }

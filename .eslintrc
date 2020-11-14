@@ -25,10 +25,11 @@
   },
   "rules": {
     "no-unused-vars": ["warn", { "varsIgnorePattern": "_" }],
+    "react/prop-types": "off",
+    "react/no-unescaped-entities": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "varsIgnorePattern": "_" }],
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-this-alias": "off",
-    "react/prop-types": "off",
-    "react/no-unescaped-entities": "off"
+    "@typescript-eslint/ban-ts-comment": "off"
   }
 }

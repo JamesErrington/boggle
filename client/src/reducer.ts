@@ -1,15 +1,27 @@
 import type { Dispatch as ReactDispatch } from "react"
+import type { Socket } from "socket.io-client"
 
+import { createSocket, submitFoundWords } from "./network"
 import { isValidMove, lookupWordFromIndexes, lookupWordFromString, wordAlreadyFound } from "./utils"
-import type { Word, GenerateGameResponse } from "../../shared/types"
+import type {
+  Word,
+  GenerateGameResponse,
+  SocketConnectionQuery,
+  SocketUpdate,
+  Player,
+  FoundWords,
+  Result
+} from "../../shared/types"
 
 export enum View {
   "MAIN" = 0,
-  "GAME" = 1
+  "GAME" = 1,
+  "LOBBY" = 2
 }
 
 export enum GameType {
-  "SOLO" = 0
+  "SOLO" = 0,
+  "MULTI" = 1
 }
 
 export interface AppState {
@@ -26,6 +38,14 @@ export interface AppState {
   foundWordCount: number
   foundWordScore: number
   currentWordIndexes: number[]
+  socket: typeof Socket | null
+  code: string
+  player: Player | null
+  allAreReady: boolean
+  isHost: boolean
+  players: Player[]
+  lobbyFoundWords: Record<string, FoundWords>
+  result: Result
 }
 
 export const initialAppState: AppState = {
@@ -41,7 +61,19 @@ export const initialAppState: AppState = {
   foundWords: [],
   foundWordCount: 0,
   foundWordScore: 0,
-  currentWordIndexes: []
+  currentWordIndexes: [],
+  socket: null,
+  code: "",
+  player: null,
+  allAreReady: false,
+  isHost: false,
+  players: [],
+  lobbyFoundWords: {},
+  result: {
+    score: 0,
+    uniqueWords: 0,
+    winners: {}
+  }
 }
 
 type Action =
@@ -54,6 +86,9 @@ type Action =
   | { type: "EndWord" }
   | { type: "TickTimer_Solo" }
   | { type: "HighlightWord"; payload: string | null }
+  | { type: "LobbyView" }
+  | { type: "CreateSocket"; payload: SocketConnectionQuery }
+  | { type: "SocketUpdate"; payload: SocketUpdate }
 
 export type Dispatch = ReactDispatch<Action>
 
@@ -197,6 +232,97 @@ export function appReducer(state: AppState, action: Action): AppState {
       return {
         ...state,
         currentWordIndexes: foundWord.path
+      }
+    }
+    case "LobbyView": {
+      return {
+        ...state,
+        view: View.LOBBY
+      }
+    }
+    case "CreateSocket": {
+      const socket = createSocket(action.payload)
+      return {
+        ...state,
+        socket
+      }
+    }
+    case "SocketUpdate": {
+      const update = action.payload
+      switch (update.type) {
+        case "LobbyState": {
+          const { code, isHost, player } = update.payload
+          return {
+            ...state,
+            code,
+            isHost,
+            player
+          }
+        }
+        case "Players": {
+          const id = (state.player && state.player.id) as string
+          const player = update.payload.find(lobbyPlayer => lobbyPlayer.id === id) as Player
+          const allAreReady = update.payload.every(lobbyPlayer => lobbyPlayer.ready)
+          return {
+            ...state,
+            players: update.payload,
+            player,
+            allAreReady
+          }
+        }
+        case "StartGame": {
+          const { board, words, totalWordCount, totalWordScore, timeLeft, player } = update.payload
+          return {
+            ...state,
+            view: View.GAME,
+            gameType: GameType.MULTI,
+            board,
+            totalWords: words,
+            totalWordCount,
+            totalWordScore,
+            timeLeft,
+            result: {
+              score: 0,
+              uniqueWords: 0,
+              winners: {}
+            },
+            foundWordCount: 0,
+            foundWordScore: 0,
+            foundWords: [],
+            lobbyFoundWords: {},
+            player
+          }
+        }
+        case "TimerTick": {
+          const { socket, code, foundWords } = state
+          const timeLeft = update.payload
+
+          if (timeLeft <= 0 && socket) {
+            submitFoundWords(socket, code, foundWords)
+          }
+
+          return {
+            ...state,
+            timeLeft: update.payload
+          }
+        }
+        case "FoundWords": {
+          const id = (state.player && state.player.id) as string
+          const foundWords = update.payload.foundWords[id]
+          const player = update.payload.players.find(lobbyPlayer => lobbyPlayer.id === id) as Player
+          return {
+            ...state,
+            foundWords: foundWords.words,
+            foundWordScore: foundWords.score,
+            lobbyFoundWords: update.payload.foundWords,
+            result: update.payload.result,
+            players: update.payload.players,
+            player
+          }
+        }
+        default: {
+          throw new Error(`Unhandled socket update type ${(update as SocketUpdate).type}`)
+        }
       }
     }
     default: {

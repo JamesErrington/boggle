@@ -5,6 +5,7 @@ import { Timer } from "../components/Timer"
 import { Board } from "../components/Board"
 import { GameControls } from "../components/GameControls"
 import { WordTable } from "../components/WordTable"
+import { PlayerList } from "../components/PlayerList"
 
 import { useAppState, useAppDispatch } from "../context"
 import { GameType } from "../reducer"
@@ -36,6 +37,9 @@ export const GameView: FunctionComponent = () => {
       </div>
       <div className="game-controls-container">
         <GameControls />
+      </div>
+      <div className="player-container">
+        {gameType === GameType.MULTI && <PlayerList />}
       </div>
       <div className="word-container">
         <WordTable />

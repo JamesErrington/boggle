@@ -11,6 +11,9 @@ interface Props {
 
 export const WordTableRow: FunctionComponent<Props> = ({ index, word }) => {
   const dispatch = useAppDispatch()
+  const style = {
+    textDecoration: word.foundBySomeoneElse ? "line-through" : "none"
+  }
 
   function handleMouseEnter(event: MouseEvent<HTMLElement>) {
     const word = event.currentTarget.getAttribute("data-word")
@@ -22,7 +25,7 @@ export const WordTableRow: FunctionComponent<Props> = ({ index, word }) => {
     dispatch({ type: "HighlightWord", payload: null })
   }
   return (
-    <tr onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} data-word={word.string}>
+    <tr style={style} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} data-word={word.string}>
       <td>{index + 1}</td>
       <td>{word.string}</td>
       <td>{word.score}</td>
